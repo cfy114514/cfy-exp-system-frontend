@@ -196,8 +196,9 @@ const handleStatusChange = async (row: any, val: any) => {
 };
 
 const handleResetPwd = async (row: any) => {
+  let newPassword;
   try {
-    const { value: newPassword } = await ElMessageBox.prompt(
+    const result = await ElMessageBox.prompt(
       `请输入用户 @${row.username} 的新密码`,
       '重置密码',
       {
@@ -208,12 +209,20 @@ const handleResetPwd = async (row: any) => {
         inputType: 'password'
       }
     );
-    if (newPassword) {
+    newPassword = result.value;
+  } catch (cancel) {
+    return; // 用户点击取消，直接退出
+  }
+
+  if (newPassword) {
+    try {
       await AdminAPI.resetUserPassword(row.id, newPassword);
       ElMessage.success({ message: `用户 @${row.username} 的密码已成功重置`, showClose: true });
+    } catch (error: any) {
+      // 捕捉后端报错并显示，避免错误被静默吞掉
+      const errMsg = error.response?.data?.detail || '密码修改失败，请检查网络或后端服务';
+      ElMessage.error({ message: typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg), showClose: true });
     }
-  } catch (e) {
-    // 用户取消输入
   }
 };
 
