@@ -2,9 +2,8 @@ import axios from 'axios';
 import { ElMessage, ElNotification } from 'element-plus';
 import router from '@/router';
 
-// 创建 axios 实例
 const service = axios.create({
-  baseURL: '', // 我们在 vite.config.ts 中配置了 /api 代理，如果有其他前缀可以写在这里
+  baseURL: import.meta.env.VITE_API_BASE_URL || '', // 从环境变量读取后端地址
   timeout: 50000 // 考虑到后台 DSP 有运算开销，给足一定的时间
 });
 
