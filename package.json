@@ -19,6 +19,8 @@
     "vue-router": "^5.0.4"
   },
   "devDependencies": {
+    "@emnapi/core": "^1.10.0",
+    "@emnapi/runtime": "^1.10.0",
     "@types/node": "^24.12.2",
     "@types/papaparse": "^5.5.2",
     "@vitejs/plugin-vue": "^6.0.5",
