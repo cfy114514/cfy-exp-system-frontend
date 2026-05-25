@@ -250,7 +250,7 @@ const handleRegister = async () => {
   if (valid) {
     loading.value = true;
     try {
-      const res = await AuthAPI.register({
+      await AuthAPI.register({
         username: registerForm.username,
         password: registerForm.password,
         role: registerForm.role,

@@ -152,14 +152,6 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useUserStore } from '@/store/user';
-import { 
-  Plus, 
-  Upload, 
-  Files, 
-  Microphone, 
-  Histogram, 
-  Document 
-} from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue';
 
