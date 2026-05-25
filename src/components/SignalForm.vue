@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, defineExpose } from 'vue';
+import { ref, reactive, watch} from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import type { WaveType, SignalConfig } from '../types';
 

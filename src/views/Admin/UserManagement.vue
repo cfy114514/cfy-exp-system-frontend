@@ -71,7 +71,7 @@
               :active-value="1"
               :inactive-value="0"
               active-color="#10b981"
-              @change="(val) => handleStatusChange(row, val)"
+              @change="(val: any) => handleStatusChange(row, val)"
             />
           </template>
         </el-table-column>
