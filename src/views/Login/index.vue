@@ -283,7 +283,8 @@ const handleRegister = async () => {
 }
 
 .glass-panel {
-  width: 440px;
+  width: 90%;
+  max-width: 440px;
   padding: 40px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
@@ -325,5 +326,15 @@ const handleRegister = async () => {
   margin-top: 15px;
   font-size: 14px;
   color: #666;
+}
+
+@media (max-width: 480px) {
+  .glass-panel {
+    padding: 30px 20px;
+    border-radius: 12px;
+  }
+  .brand h2 {
+    font-size: 18px;
+  }
 }
 </style>

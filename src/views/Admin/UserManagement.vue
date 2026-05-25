@@ -352,4 +352,35 @@ const handleCreateUser = () => {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 .shadow-premium { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+
+@media (max-width: 768px) {
+  .glass-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .h-right.search-box {
+    width: 100%;
+    flex-direction: row;
+  }
+  .premium-search {
+    flex: 1;
+    width: auto;
+  }
+  .ml-4 {
+    margin-left: 8px !important;
+  }
+  .title {
+    font-size: 22px;
+  }
+  .subtitle {
+    font-size: 13px;
+  }
+  .stat-item {
+    padding: 16px;
+  }
+  .stat-value {
+    font-size: 24px;
+  }
+}
 </style>

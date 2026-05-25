@@ -1,7 +1,7 @@
 <template>
   <el-container class="admin-layout-container">
     <!-- 左侧菜单边栏 -->
-    <el-aside width="240px" class="layout-aside">
+    <el-aside v-if="!isMobile" width="240px" class="layout-aside">
       <div class="logo-area">
         <el-icon :size="24" color="#fff" class="mr-2"><Platform /></el-icon>
         <span class="logo-text">管理中心</span>
@@ -30,8 +30,6 @@
           <span>历史记录</span>
         </el-menu-item>
 
-
-
         <!-- 管理员专属高级功能 -->
         <template v-if="userStore.userInfo?.role === 'admin'">
           <div class="menu-divider">系统管理</div>
@@ -47,12 +45,67 @@
       </el-menu>
     </el-aside>
 
+    <!-- 移动端抽屉导航 -->
+    <el-drawer
+      v-model="drawerVisible"
+      direction="ltr"
+      size="240px"
+      :with-header="false"
+      class="mobile-menu-drawer"
+    >
+      <div class="logo-area">
+        <el-icon :size="24" color="#fff" class="mr-2"><Platform /></el-icon>
+        <span class="logo-text">管理中心</span>
+      </div>
+      <el-menu
+        :default-active="route.path"
+        class="main-menu"
+        background-color="#191a23"
+        text-color="#a0a5b8"
+        active-text-color="#ffffff"
+        router
+        @select="drawerVisible = false"
+      >
+        <el-menu-item index="/dashboard">
+          <el-icon><DataBoard /></el-icon>
+          <span>工作台</span>
+        </el-menu-item>
+        <el-menu-item index="/projects" v-if="userStore.userInfo?.role === 'admin'">
+          <el-icon><Files /></el-icon>
+          <span>实验项目</span>
+        </el-menu-item>
+        <el-menu-item index="/records">
+          <el-icon><Document /></el-icon>
+          <span>历史记录</span>
+        </el-menu-item>
+        <template v-if="userStore.userInfo?.role === 'admin'">
+          <div class="menu-divider">系统管理</div>
+          <el-menu-item index="/admin/users">
+            <el-icon><User /></el-icon>
+            <span>人员大盘管理</span>
+          </el-menu-item>
+          <el-menu-item index="/admin/teams">
+            <el-icon><Management /></el-icon>
+            <span>加组申请审批</span>
+          </el-menu-item>
+        </template>
+      </el-menu>
+    </el-drawer>
+
     <el-container class="layout-main-panel">
       <!-- 顶部 Header 状态栏 -->
       <el-header height="60px" class="layout-header">
         <div class="header-left">
-          <!-- 预留系统面包屑位置 -->
-          <el-breadcrumb separator="/">
+          <el-button
+            v-if="isMobile"
+            type="primary"
+            link
+            class="menu-toggle-btn"
+            @click="drawerVisible = true"
+          >
+            <el-icon :size="20"><MenuIcon /></el-icon>
+          </el-button>
+          <el-breadcrumb separator="/" v-else>
             <el-breadcrumb-item>总览管理</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -88,21 +141,36 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
-import { Platform, DataBoard, Files, Document, ArrowDown, User, Management } from '@element-plus/icons-vue';
+import { Platform, DataBoard, Files, Document, ArrowDown, User, Management, Menu as MenuIcon } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 
-// 若一进该 Layout 发现自己有通关文牒（Token）但脑子里没记忆（UserInfo），立刻向后端要
+const isMobile = ref(false);
+const drawerVisible = ref(false);
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+  if (!isMobile.value) {
+    drawerVisible.value = false;
+  }
+};
+
 onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
   if (userStore.token && !userStore.userInfo) {
     userStore.fetchUserInfo();
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile);
 });
 
 const handleCommand = (command: string) => {
@@ -207,5 +275,34 @@ const handleCommand = (command: string) => {
 .fade-transform-leave-to {
   opacity: 0;
   transform: translateX(20px);
+}
+
+.menu-toggle-btn {
+  padding: 0;
+  height: auto;
+  color: #333;
+  margin-right: 12px;
+}
+
+:deep(.mobile-menu-drawer) {
+  background-color: #191a23 !important;
+}
+
+:deep(.mobile-menu-drawer .el-drawer__body) {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .layout-body-wrapper {
+    padding: 12px;
+  }
+  .layout-header {
+    padding: 0 12px;
+  }
+  .username {
+    display: none;
+  }
 }
 </style>
