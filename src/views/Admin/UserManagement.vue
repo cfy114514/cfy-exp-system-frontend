@@ -80,11 +80,7 @@
           <template #default="{ row }">
             <el-button-group class="action-group">
               <el-button size="small" :icon="Edit" @click="handleOpenEdit(row)">编辑资料</el-button>
-              <el-popconfirm title="确定强制重置密码吗？" @confirm="handleResetPwd(row)">
-                <template #reference>
-                  <el-button size="small" :icon="RefreshLeft" type="warning">重置</el-button>
-                </template>
-              </el-popconfirm>
+              <el-button size="small" :icon="RefreshLeft" type="warning" @click="handleResetPwd(row)">重置</el-button>
             </el-button-group>
           </template>
         </el-table-column>
@@ -141,7 +137,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { Plus, Edit, RefreshLeft, Search, User, Stamp, Timer, Lock } from '@element-plus/icons-vue';
-import { ElMessage, ElNotification } from 'element-plus';
+import { ElMessage, ElNotification, ElMessageBox } from 'element-plus';
 import { AdminAPI } from '@/api';
 
 const loading = ref(false);
@@ -201,9 +197,24 @@ const handleStatusChange = async (row: any, val: any) => {
 
 const handleResetPwd = async (row: any) => {
   try {
-    await AdminAPI.resetUserPassword(row.id);
-    ElMessage.success({ message: `用户 @${row.username} 的令牌已重置为系统默认值`, showClose: true });
-  } catch (e) {}
+    const { value: newPassword } = await ElMessageBox.prompt(
+      `请输入用户 @${row.username} 的新密码`,
+      '重置密码',
+      {
+        confirmButtonText: '确定重置',
+        cancelButtonText: '取消',
+        inputPattern: /^.{6,}$/,
+        inputErrorMessage: '密码长度不能少于 6 位',
+        inputType: 'password'
+      }
+    );
+    if (newPassword) {
+      await AdminAPI.resetUserPassword(row.id, newPassword);
+      ElMessage.success({ message: `用户 @${row.username} 的密码已成功重置`, showClose: true });
+    }
+  } catch (e) {
+    // 用户取消输入
+  }
 };
 
 const editVisible = ref(false);

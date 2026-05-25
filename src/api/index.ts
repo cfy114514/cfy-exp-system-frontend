@@ -114,8 +114,8 @@ export const AdminAPI = {
     return request.put(`/api/admin/users/${userId}/status`, { is_active: isActive });
   },
   // 强制重置用户密码
-  resetUserPassword(userId: number) {
-    return request.post(`/api/admin/users/${userId}/reset-password`);
+  resetUserPassword(userId: number, newPassword: string) {
+    return request.post(`/api/admin/users/${userId}/reset-password`, { new_password: newPassword });
   },
   // 修改基本详勘信息 (真实姓名、部门)
   updateUserProfile(userId: number, data: { real_name?: string; department?: string }) {
