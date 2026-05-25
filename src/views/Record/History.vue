@@ -124,10 +124,10 @@
 
         <!-- 情况 A: 有波形，展示图表 -->
         <DualWaveChart 
-          v-if="activeRecord && activeRecord.chart_data"
-          :time-axis="activeRecord.chart_data.time_axis" 
-          :raw-data="activeRecord.chart_data.CH1_raw" 
-          :cleaned-data="activeRecord.chart_data.CH1_cleaned"
+          v-if="activeRecord && chartPlaybackData"
+          :time-axis="chartPlaybackData.timeAxis" 
+          :raw-data="chartPlaybackData.rawData" 
+          :cleaned-data="chartPlaybackData.cleanedData"
           height="450px"
         />
 
@@ -252,6 +252,24 @@ const formatStorageUrl = (path: string) => {
 const currentPreviewList = computed(() => {
   if (!activeRow.value?.site_photos_paths) return [];
   return activeRow.value.site_photos_paths.map((p: string) => formatStorageUrl(p));
+});
+
+// 动态解析后端返回的波形数据通道键值，防止因列名为 Voltage 等其他名称时找不到 CH1_raw 崩溃
+const chartPlaybackData = computed(() => {
+  if (!activeRecord.value?.chart_data) return null;
+  const cd = activeRecord.value.chart_data;
+  
+  // 寻获第一个以 _raw 结尾的原始通道数据键
+  const rawKey = Object.keys(cd).find(key => key.endsWith('_raw'));
+  if (!rawKey) return null;
+  
+  const channelPrefix = rawKey.slice(0, -4); // 剔除 '_raw' 获取如 'CH1' 或 'Voltage' 的通道前缀
+  
+  return {
+    timeAxis: cd.time_axis || [],
+    rawData: cd[rawKey] || [],
+    cleanedData: cd[`${channelPrefix}_cleaned`] || []
+  };
 });
 
 const dialogVisible = ref(false);
