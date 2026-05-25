@@ -61,7 +61,7 @@
           <el-dropdown trigger="click" @command="handleCommand">
             <span class="user-dropdown">
               <el-avatar :size="32" :src="userStore.userInfo?.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
-              <span class="username">{{ userStore.userInfo?.real_name || '未名人员' }}</span>
+              <span class="username">{{ userStore.userInfo?.real_name || userStore.userInfo?.username }}</span>
               <el-tag size="small" type="success" effect="dark">{{ userStore.userInfo?.role }}</el-tag>
               <el-icon class="el-icon--right"><arrow-down /></el-icon>
             </span>

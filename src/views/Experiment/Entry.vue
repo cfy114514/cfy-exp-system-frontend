@@ -163,7 +163,6 @@ import {
 import { ElMessage } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue';
 
-// 导入刚开发的两个利器
 import SignalForm from '../../components/SignalForm.vue';
 import WaveChart from '../../components/WaveChart.vue';
 import { parseOscilloscopeCSV } from '../../utils/csvParser';
@@ -174,16 +173,13 @@ import type { FormInstance } from 'element-plus';
 const route = useRoute();
 const userStore = useUserStore();
 
-// 如果是从 Dashboard 点过来的，会带 ProjectId
 const currentProjectId = ref((route.query.projectId as string) || 'PROJ-DEFAULT-000');
 const currentProjectName = ref((route.query.projectName as string) || '临时本地试验沙箱');
 
-// --- 控制流变量 ---
 const activeStep = ref(0);
 const isParsing = ref(false);
 const isSubmitting = ref(false);
 
-// --- 新增：环境持久化与备注 ---
 const notes = ref('');
 const CACHE_KEY_PREFIX = 'exp_env_';
 
@@ -208,7 +204,6 @@ const saveEnvCache = () => {
 // 监听项目 ID 变化重新加载
 onMounted(loadEnvCache);
 
-// --- 步骤1：环境表单状态 ---
 const envFormRef = ref<FormInstance>();
 const envForm = reactive({ temperature: 25.0, humidity: 50 });
 const envRules = {
@@ -216,28 +211,19 @@ const envRules = {
   humidity: [{ required: true, message: '录入湿度', trigger: 'blur' }]
 };
 
-// --- 步骤2：信号发状态代理 ---
-// 从外部拿到封装好的组件 ref
 const signalFormRef = ref<InstanceType<typeof SignalForm>>();
-
-// --- 步骤3：CSV 结果留存 ---
 const parseResult = ref<CSVParseResult | null>(null);
 const currentCsvFile = ref<File | null>(null);
 const sitePhotos = ref<File[]>([]);
 const reportPdf = ref<File | null>(null);
 
-/**
- * 验证和转跳逻辑控制
- */
 const goNextStep = async () => {
   if (activeStep.value === 0) {
-    // 示波器 CSV 改为非必填，仅弹窗提示
     if (!parseResult.value) {
       ElMessage.info('未检测到波形数据，记录将作为纯文字/图片档案保存。');
     }
     activeStep.value++;
   } else if (activeStep.value === 1) {
-    // 步骤 2 包含环境(必填)和信号(选填)
     if (!envFormRef.value) return;
     try {
       await envFormRef.value.validate();
@@ -248,9 +234,6 @@ const goNextStep = async () => {
   }
 };
 
-/**
- * 文件变更，即触发客户端核心解析
- */
 const handleCsvUpload = async (uploadFile: any) => {
   const rawFile = uploadFile.raw as File;
   if (!rawFile) return;
@@ -261,7 +244,7 @@ const handleCsvUpload = async (uploadFile: any) => {
 
   currentCsvFile.value = rawFile;
   isParsing.value = true;
-  parseResult.value = null; // 清空历史
+  parseResult.value = null;
 
   try {
     const result = await parseOscilloscopeCSV(rawFile);
@@ -294,18 +277,12 @@ const handlePdfUpload = (uploadFile: any) => {
 const handlePdfRemove = () => {
   reportPdf.value = null;
 };
-
-/**
- * 【终极使命】：组装核心数据上报网络
- */
 const finalSubmit = async () => {
-  // 不再拦截无 CSV 提交，只要有备注或照片即可
   if (!parseResult.value && !notes.value && sitePhotos.value.length === 0) {
     ElMessage.error('请至少录入一项波形、备注或现场照片，不可提交全空记录。');
     return;
   }
 
-  // 发生源数据 (在优化后的逻辑中可选)
   const signalData = await signalFormRef.value?.validateAndGetForm();
   if (signalData === false) {
       ElMessage.error('信号源参数格式错误（若不填写请清空所有信号源字段）。');
@@ -315,35 +292,25 @@ const finalSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    // 【核心设计说明书 3.4 条块完美实现】—— 利用 FormData 提供混合负载
     const formData = new FormData();
     
-    // 1. 物理 CSV (若有)
     if (currentCsvFile.value) {
       formData.append('oscilloscope_file', currentCsvFile.value);
     }
     
-    // 2. 环境登记
     formData.append('env_temperature', String(envForm.temperature));
     formData.append('env_humidity', String(envForm.humidity));
     
-    // 3. 激励源参数 (信号发设定 JSON序列化一波带走减少字典厚度)
-    // 3. 激励源参数 (若为 null 表示跳过，后端应能正确处理)
     formData.append('signal_config', signalData ? JSON.stringify(signalData) : '');
-    
-    // 3.1 文字备注录入
     formData.append('notes', notes.value);
     
-    // 4. 前端已帮忙测算的精加工结果 (若无波形，主动补齐默认值以防后端 422 报错)
     formData.append('measured_vpp', parseResult.value ? String(parseResult.value.measured_vpp) : '0.0');
-    formData.append('channel_name', parseResult.value ? parseResult.value.channel_name : 'N/A (纯图文)');
+    formData.append('channel_name', parseResult.value ? parseResult.value.channel_name : '');
     formData.append('data_points', parseResult.value ? String(parseResult.value.data_points) : '0');
 
-    // 5. 【系统升维闭环】：通过 Pinia 强制打上个人的 User Identity，且附带所属父级项目外键
-    formData.append('operator_id', userStore.userInfo?.id || 'ANONYMOUS');
+    formData.append('operator_id', userStore.userInfo?.id || '');
     formData.append('project_id', currentProjectId.value);
 
-    // 6. 新增：多源附件（照片集与 PDF 报告）
     sitePhotos.value.forEach(photo => {
       formData.append('site_photos', photo);
     });

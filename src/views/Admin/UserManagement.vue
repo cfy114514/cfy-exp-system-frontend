@@ -1,6 +1,5 @@
 <template>
   <div class="admin-page-container animate-fade-in">
-    <!-- 顶部统计大盘 -->
     <el-row :gutter="20" class="mb-6">
       <el-col :xs="24" :sm="6" v-for="stat in stats" :key="stat.label">
         <div class="glass-card stat-item shadow-premium" :class="stat.color">
@@ -32,7 +31,6 @@
       </div>
     </div>
 
-    <!-- 用户列表表格 -->
     <el-card class="glass-table-card shadow-premium">
       <el-table 
         :data="filteredUsers" 
@@ -45,7 +43,7 @@
             <div class="user-profile">
               <el-avatar :size="42" :src="formatAvatar(row.avatar_path)" class="profile-avatar" />
               <div class="profile-info">
-                <div class="real-name">{{ row.real_name || '未补全姓名' }}</div>
+                <div class="real-name">{{ row.real_name || row.username }}</div>
                 <div class="username-tag">@{{ row.username }}</div>
               </div>
             </div>
@@ -93,7 +91,6 @@
       </el-table>
     </el-card>
 
-    <!-- 综合编辑对话框 -->
     <el-dialog v-model="editVisible" title="核心人员档案修改" width="550px" class="premium-dialog">
       <el-tabs v-model="activeEditTab">
         <el-tab-pane label="基本详勘" name="profile">
@@ -152,7 +149,6 @@ const users = ref<any[]>([]);
 const searchQuery = ref('');
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png';
 
-// 统计大盘计算
 const stats = computed(() => [
   { label: '科研总人数', value: users.value.length, icon: User, color: 'blue' },
   { label: '活跃研究员', value: users.value.filter(u => u.is_active === 1).length, icon: Timer, color: 'green' },
@@ -160,7 +156,6 @@ const stats = computed(() => [
   { label: '受限账号', value: users.value.filter(u => u.is_active === 0).length, icon: Lock, color: 'red' },
 ]);
 
-// 过滤后的列表
 const filteredUsers = computed(() => {
   if (!searchQuery.value) return users.value;
   const q = searchQuery.value.toLowerCase();
@@ -173,7 +168,6 @@ const filteredUsers = computed(() => {
 const formatAvatar = (path: string) => {
   if (!path) return defaultAvatar;
   if (path.startsWith('http')) return path;
-  // 后端物理路径转换
   return `/api/files/download/${path.replace(/\\/g, '/')}`;
 };
 
@@ -191,7 +185,6 @@ const fetchUsers = async () => {
 
 onMounted(fetchUsers);
 
-// 状态控制逻辑
 const handleStatusChange = async (row: any, val: any) => {
   try {
     await AdminAPI.updateUserStatus(row.id, val);
@@ -213,7 +206,6 @@ const handleResetPwd = async (row: any) => {
   } catch (e) {}
 };
 
-// --- 综合编辑逻辑 ---
 const editVisible = ref(false);
 const activeEditTab = ref('profile');
 const editingUser = ref<any>(null);
@@ -250,19 +242,15 @@ const submitGlobalEdit = async () => {
   try {
     const uId = editingUser.value.id;
     const tasks = [];
-    
-    // 1. 基本信息
     tasks.push(AdminAPI.updateUserProfile(uId, {
       real_name: editForm.value.real_name,
       department: editForm.value.department
     }));
     
-    // 2. 角色变更
     if (editForm.value.role !== editingUser.value.role) {
       tasks.push(AdminAPI.updateUserRole(uId, editForm.value.role));
     }
     
-    // 3. 头像上传
     if (selectedAvatarFile.value) {
       tasks.push(AdminAPI.uploadAvatar(uId, selectedAvatarFile.value));
     }

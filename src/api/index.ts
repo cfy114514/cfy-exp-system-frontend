@@ -17,6 +17,11 @@ export const AuthAPI = {
     });
   },
   
+  // 注册新用户
+  register(data: { username: string; password: string; role: 'student' | 'teacher'; real_name?: string; department?: string }) {
+    return request.post('/api/auth/register', data);
+  },
+  
   // 拉取登录者的 RBAC 权限等级联数据
   me() {
     return request.get('/api/auth/me');

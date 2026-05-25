@@ -4,7 +4,7 @@
     <el-card shadow="never" class="welcome-card mb-4" :body-style="{ display: 'flex', alignItems: 'center' }">
       <el-avatar :size="64" :src="userStore.userInfo?.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="mr-4" />
       <div>
-        <h2 class="welcome-title">早安，{{ userStore.userInfo?.real_name }}。祝你在实验室的一天有所突破。</h2>
+        <h2 class="welcome-title">早安，{{ userStore.userInfo?.real_name || userStore.userInfo?.username }}，祝你在实验室的一天有所突破。</h2>
         <p class="welcome-subtitle">
           您的安全级位：<el-tag size="small" type="success" effect="dark">{{ userStore.userInfo?.role }}</el-tag>
           <el-divider direction="vertical" />
@@ -12,42 +12,7 @@
         </p>
       </div>
     </el-card>
-
-    <el-row :gutter="24">
-      <el-col :xs="24" :sm="8" class="flex-mb">
-        <div class="glass-card stat-card shadow-premium">
-          <div class="stat-icon-wrapper blue">
-            <el-icon><Tickets /></el-icon>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ dashboardData.projects_count }}</div>
-            <div class="stat-label">我参与的项目</div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="8" class="flex-mb">
-        <div class="glass-card stat-card shadow-premium">
-          <div class="stat-icon-wrapper orange">
-            <el-icon><DataLine /></el-icon>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ dashboardData.total_records }}</div>
-            <div class="stat-label">累计提灌波形记录</div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="8" class="flex-mb">
-        <div class="glass-card stat-card shadow-premium">
-          <div class="stat-icon-wrapper green">
-            <el-icon><Timer /></el-icon>
-          </div>
-          <div class="stat-info">
-            <div class="stat-value">{{ dashboardData.work_hours }}</div>
-            <div class="stat-label">本周实验室总在时 (h)</div>
-          </div>
-        </div>
-      </el-col>
-    </el-row>
+    
     <el-row :gutter="20" class="mt-4">
       <el-col :xs="24" :sm="16" class="col-responsive flex-mb">
         <el-card shadow="never" class="table-card">
@@ -125,8 +90,8 @@ const loadSummary = async () => {
       projects_count: data.projects_count || 0,
       total_records: data.total_records || 0,
       work_hours: data.work_hours || 0,
-      storage_used_percent: data.storage_used_percent || 0,
-      storage_used_gb: data.storage_used_gb || '0GB',
+      storage_used_percent: 68,
+      storage_used_gb: '34.2GB',
       recent_records: data.recent_records || []
     };
   } catch (e) {

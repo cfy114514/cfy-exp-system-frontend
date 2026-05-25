@@ -31,26 +31,27 @@
           </el-avatar-group>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="220" fixed="right" align="center">
         <template #default="{ row }">
-          <el-button 
-            type="primary" 
-            size="small" 
-            :disabled="row.status === 'completed'"
-            @click="jumpToEntry(row.project_id, row.project_name)"
-            style="margin-bottom: 5px"
-          >
-            录入实验数据
-          </el-button>
-          
-          <el-button 
-            type="info" 
-            size="small" 
-            plain
-            @click="jumpToRecords(row.project_id)"
-          >
-            查看历史记录
-          </el-button>
+          <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+            <el-button 
+              type="primary" 
+              size="small" 
+              :disabled="row.status === 'completed'"
+              @click="jumpToEntry(row.project_id, row.project_name)"
+            >
+              录入实验数据
+            </el-button>
+            
+            <el-button 
+              type="info" 
+              size="small" 
+              plain
+              @click="jumpToRecords(row.project_id)"
+            >
+              查看历史记录
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
