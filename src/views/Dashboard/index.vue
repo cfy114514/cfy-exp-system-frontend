@@ -86,11 +86,11 @@ const loadSummary = async () => {
     const res: any = await DashboardAPI.getSummary();
     const data = res.data || res;
     dashboardData.value = {
-      projects_count: data.projects_count || 0,
+      projects_count: data.total_projects || 0, // 对应后端返回的 total_projects
       total_records: data.total_records || 0,
       work_hours: data.work_hours || 0,
-      storage_used_percent: 68,
-      storage_used_gb: '34.2GB',
+      storage_used_percent: data.storage_used_percent !== undefined ? data.storage_used_percent : 0, // 读取后端返回的真实百分比
+      storage_used_gb: data.storage_used_gb || '0 GB', // 读取后端返回的真实容量大小
       recent_records: data.recent_records || []
     };
   } catch (e) {

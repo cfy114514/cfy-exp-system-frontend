@@ -235,6 +235,7 @@ const handleCommand = (command: string) => {
   display: flex;
   flex-direction: column;
   background-color: #f0f2f5;
+  min-width: 0; /* 防止被内部表格等内容撑开导致移动端横向溢出 */
 }
 
 .layout-header {

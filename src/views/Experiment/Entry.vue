@@ -402,5 +402,26 @@ const finalSubmit = async () => {
     margin: 20px 0;
     width: 100%;
   }
+  .step-container {
+    padding: 15px;
+    margin-bottom: 15px;
+    min-height: auto;
+  }
+  .experiment-entry-page {
+    padding: 10px;
+  }
+  .extra-uploads .el-button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+  .mt-2 {
+    margin-top: 8px !important;
+  }
+  :deep(.el-step__description) {
+    display: none !important;
+  }
+  :deep(.el-step__title) {
+    font-size: 12px !important;
+  }
 }
 </style>

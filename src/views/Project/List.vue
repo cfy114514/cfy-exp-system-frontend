@@ -31,7 +31,7 @@
           </el-avatar-group>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="220" fixed="right" align="center">
+      <el-table-column label="操作" width="220" align="center">
         <template #default="{ row }">
           <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
             <el-button 
