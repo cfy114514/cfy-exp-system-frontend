@@ -39,6 +39,10 @@ export const useUserStore = defineStore('user', () => {
     try {
       const meRes: any = await AuthAPI.me();
       const userProfile = meRes.data || meRes;
+      if (userProfile && userProfile.avatar_path) {
+        const cleanPath = userProfile.avatar_path.replace(/\\/g, '/');
+        userProfile.avatar = `/api/${cleanPath}`;
+      }
       userInfo.value = userProfile;
     } catch (e) {
       // Token 如果已死，会由 request.ts 响应拦截器处理踢出

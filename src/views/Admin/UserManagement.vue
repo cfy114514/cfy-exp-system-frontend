@@ -164,7 +164,7 @@ const filteredUsers = computed(() => {
 const formatAvatar = (path: string) => {
   if (!path) return defaultAvatar;
   if (path.startsWith('http')) return path;
-  return `/api/files/download/${path.replace(/\\/g, '/')}`;
+  return `/api/${path.replace(/\\/g, '/')}`;
 };
 
 const fetchUsers = async () => {
