@@ -326,9 +326,10 @@ const handleDownload = async (type: string, row: any) => {
     return;
   }
 
-  // 根据 type 告知后台意图 (假设后端可接收查询 params ?type=xx 来支持异源，如果没有就全量给)
+  // 根据 type 告知后台意图。为避免广告拦截插件拦截包含 "type=pdf" 的请求，将参数名改为 category，且将 "pdf" 映射为 "report"
+  const backendCategory = type === 'pdf' ? 'report' : type;
   try {
-    const res: any = await ExperimentAPI.downloadFileAsBlob(`${fileIdForBackend}?type=${type}`);
+    const res: any = await ExperimentAPI.downloadFileAsBlob(`${fileIdForBackend}?category=${backendCategory}`);
     if (!res) throw new Error('流为空');
 
     // Blob 落盘
