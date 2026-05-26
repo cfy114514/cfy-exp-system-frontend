@@ -94,6 +94,11 @@ export const ExperimentAPI = {
   // (🔥新增) 新通道并发提取服务：接收组列 ID 并请求后端调用微服务计算矩阵组合比对波形
   compareRecords(recordIds: number[]) {
     return request.post('/api/records/compare', { record_ids: recordIds });
+  },
+
+  // (🔥新增) 删除指定实验记录
+  deleteRecord(recordId: number) {
+    return request.delete(`/api/records/${recordId}`);
   }
 };
 

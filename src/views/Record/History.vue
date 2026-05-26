@@ -82,30 +82,51 @@
 
       <el-table-column prop="operator_id" label="操作员/UID" width="150" />
 
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column label="操作" width="300" fixed="right">
         <template #default="{ row }">
-          <el-button-group>
-            <el-button 
-              :type="row.file_path ? 'success' : 'primary'" 
-              size="small" 
-              plain 
-              @click="openPlayback(row)"
-            >
-              {{ row.file_path ? '波形回放' : '详情查看' }}
-            </el-button>
-            <el-dropdown trigger="click" @command="(cmd: string) => handleDownload(cmd, row)">
-              <el-button type="primary" size="small" :icon="ArrowDown" plain>
-                资源下载
+          <div class="operation-cell">
+            <el-button-group>
+              <el-button 
+                :type="row.file_path ? 'success' : 'primary'" 
+                size="small" 
+                plain 
+                @click="openPlayback(row)"
+              >
+                {{ row.file_path ? '波形回放' : '详情查看' }}
               </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="csv" :disabled="!row.file_path">原始波形 CSV</el-dropdown-item>
-                  <el-dropdown-item command="pdf" :disabled="!row.report_pdf_path">实验报告 PDF</el-dropdown-item>
-                  <el-dropdown-item command="photo" :disabled="!row.photos_count || row.photos_count === 0">现场照片集</el-dropdown-item>
-                </el-dropdown-menu>
+              <el-dropdown trigger="click" @command="(cmd: string) => handleDownload(cmd, row)">
+                <el-button type="primary" size="small" :icon="ArrowDown" plain>
+                  资源下载
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="csv" :disabled="!row.file_path">原始波形 CSV</el-dropdown-item>
+                    <el-dropdown-item command="pdf" :disabled="!row.report_pdf_path">实验报告 PDF</el-dropdown-item>
+                    <el-dropdown-item command="photo" :disabled="!row.photos_count || row.photos_count === 0">现场照片集</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </el-button-group>
+
+            <el-popconfirm
+              title="确定要彻底删除这条实验记录吗？此操作不可逆！"
+              confirm-button-text="确定"
+              cancel-button-text="取消"
+              confirm-button-type="danger"
+              @confirm="handleDeleteRecord(row)"
+            >
+              <template #reference>
+                <el-button 
+                  type="danger" 
+                  size="small" 
+                  plain 
+                  :icon="Delete"
+                >
+                  删除
+                </el-button>
               </template>
-            </el-dropdown>
-          </el-button-group>
+            </el-popconfirm>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -169,7 +190,7 @@ import { useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { ProjectAPI, ExperimentAPI } from '@/api';
 import DualWaveChart from '@/components/DualWaveChart.vue';
-import { ArrowDown, Search, Calendar, DataLine, Document, Picture } from '@element-plus/icons-vue';
+import { ArrowDown, Search, Calendar, DataLine, Document, Picture, Delete } from '@element-plus/icons-vue';
 
 const route = useRoute();
 const loading = ref(false);
@@ -329,9 +350,20 @@ const handleDownload = async (type: string, row: any) => {
     ElMessage.error('权限受阻或服务端资源游标不存在。');
   }
 };
+
+const handleDeleteRecord = async (row: any) => {
+  try {
+    await ExperimentAPI.deleteRecord(row.record_id);
+    ElMessage.success('实验记录删除成功。');
+    loadRecords();
+  } catch (e: any) {
+    ElMessage.error(e.response?.data?.detail || '删除失败，请稍后重试。');
+  }
+};
 </script>
 
 <style scoped>
+.operation-cell { display: flex; align-items: center; gap: 8px; }
 .header-container { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .time-cell { display: flex; align-items: center; color: #64748b; font-size: 13px; }
 .notes-preview { font-size: 13px; color: #334155; }
