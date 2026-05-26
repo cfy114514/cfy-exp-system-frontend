@@ -86,7 +86,7 @@ export const ExperimentAPI = {
   // 以流式拉取需授权下载的文件资源（原 CSV、PDF、现场照片）
   downloadFileAsBlob(fileId: string) {
     // 根据安全要求，需要借助 Axios 自动填入 Header 中的 Bearer Token
-    return request.get(`/api/files/download/${fileId}`, {
+    return request.get(`/api/records/attachment/${fileId}`, {
       responseType: 'blob'
     });
   },
