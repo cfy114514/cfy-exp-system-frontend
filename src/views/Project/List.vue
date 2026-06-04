@@ -3,14 +3,22 @@
     <template #header>
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span style="font-weight: bold; font-size: 16px;">实验项目列表</span>
-        <el-button 
-          type="primary" 
-          :icon="Plus" 
-          v-if="userStore.userInfo?.role === 'admin' || userStore.userInfo?.role === 'teacher'"
-          @click="createDialogVisible = true"
-        >
-          创建新项目
-        </el-button>
+        <div style="display: flex; gap: 12px;" v-if="userStore.userInfo?.role === 'admin' || userStore.userInfo?.role === 'teacher'">
+          <el-button 
+            type="success" 
+            :icon="Plus" 
+            @click="createGroupVisible = true"
+          >
+            新建课题组
+          </el-button>
+          <el-button 
+            type="primary" 
+            :icon="Plus" 
+            @click="createDialogVisible = true"
+          >
+            创建新项目
+          </el-button>
+        </div>
       </div>
     </template>
 
@@ -83,6 +91,28 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 新建课题组对话框 -->
+    <el-dialog v-model="createGroupVisible" title="创建新课题组/实验室" width="480px">
+      <el-form :model="createGroupForm" label-position="top">
+        <el-form-item label="课题组名称" required>
+          <el-input v-model="createGroupForm.name" placeholder="请输入课题组或项目组名称" />
+        </el-form-item>
+        <el-form-item label="隶属学科节点 ID" required>
+          <el-input-number v-model="createGroupForm.subject_id" :min="1" style="width: 100%;" />
+        </el-form-item>
+        <el-form-item label="公开性策略">
+          <el-radio-group v-model="createGroupForm.group_type" style="display: flex; flex-direction: column; gap: 8px;">
+            <el-radio value="public">公共学术组 (支持学子自主申请)</el-radio>
+            <el-radio value="private" disabled>私有实验区 (由系统自动关联)</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="createGroupVisible = false">取消</el-button>
+        <el-button type="primary" :loading="creatingGroup" @click="submitNewGroup">确认部署</el-button>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -109,6 +139,34 @@ const createForm = ref({
   description: '',
   group_id: ''
 });
+
+// ---- 新建课题组表单的变量代理 ----
+const createGroupVisible = ref(false);
+const creatingGroup = ref(false);
+const createGroupForm = ref({
+  name: '',
+  subject_id: 1,
+  group_type: 'public'
+});
+
+const submitNewGroup = async () => {
+  if (!createGroupForm.value.name) {
+    ElMessage.warning('请输入课题组名称');
+    return;
+  }
+  creatingGroup.value = true;
+  try {
+    await GroupAPI.createGroup(createGroupForm.value);
+    ElMessage.success('全新课题组已成功立项并部署');
+    createGroupVisible.value = false;
+    createGroupForm.value = { name: '', subject_id: 1, group_type: 'public' };
+    loadGroups(); // 重新加载下拉框
+  } catch (err: any) {
+    ElMessage.error('课题组创建失败');
+  } finally {
+    creatingGroup.value = false;
+  }
+};
 
 const loadGroups = async () => {
   if (userStore.userInfo?.role === 'admin' || userStore.userInfo?.role === 'teacher') {
