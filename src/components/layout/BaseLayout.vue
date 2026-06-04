@@ -20,7 +20,7 @@
           <span>工作台</span>
         </el-menu-item>
         
-        <el-menu-item index="/projects" v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
+        <el-menu-item index="/projects" v-if="userStore.userInfo?.role && ['admin', 'teacher'].includes(userStore.userInfo.role)">
           <el-icon><Files /></el-icon>
           <span>{{ userStore.userInfo?.role === 'teacher' ? '辖区项目看板' : '实验项目' }}</span>
         </el-menu-item>
@@ -31,7 +31,7 @@
         </el-menu-item>
 
         <!-- 管理与审批面板 -->
-        <template v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
+        <template v-if="userStore.userInfo?.role && ['admin', 'teacher'].includes(userStore.userInfo.role)">
           <div class="menu-divider">管理面板</div>
           <el-menu-item index="/admin/users" v-if="userStore.userInfo?.role === 'admin'">
             <el-icon><User /></el-icon>
@@ -70,7 +70,7 @@
           <el-icon><DataBoard /></el-icon>
           <span>工作台</span>
         </el-menu-item>
-        <el-menu-item index="/projects" v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
+        <el-menu-item index="/projects" v-if="userStore.userInfo?.role && ['admin', 'teacher'].includes(userStore.userInfo.role)">
           <el-icon><Files /></el-icon>
           <span>{{ userStore.userInfo?.role === 'teacher' ? '辖区项目看板' : '实验项目' }}</span>
         </el-menu-item>
@@ -78,7 +78,7 @@
           <el-icon><Document /></el-icon>
           <span>历史记录</span>
         </el-menu-item>
-        <template v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
+        <template v-if="userStore.userInfo?.role && ['admin', 'teacher'].includes(userStore.userInfo.role)">
           <div class="menu-divider">管理面板</div>
           <el-menu-item index="/admin/users" v-if="userStore.userInfo?.role === 'admin'">
             <el-icon><User /></el-icon>
