@@ -164,7 +164,7 @@ const checkMobile = () => {
 onMounted(() => {
   checkMobile();
   window.addEventListener('resize', checkMobile);
-  if (userStore.token && !userStore.userInfo) {
+  if (userStore.token) {
     userStore.fetchUserInfo();
   }
 });
