@@ -20,9 +20,9 @@
           <span>工作台</span>
         </el-menu-item>
         
-        <el-menu-item index="/projects" v-if="userStore.userInfo?.role === 'admin'">
+        <el-menu-item index="/projects" v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
           <el-icon><Files /></el-icon>
-          <span>实验项目</span>
+          <span>{{ userStore.userInfo?.role === 'teacher' ? '辖区项目看板' : '实验项目' }}</span>
         </el-menu-item>
         
         <el-menu-item index="/records">
@@ -30,16 +30,16 @@
           <span>历史记录</span>
         </el-menu-item>
 
-        <!-- 管理员专属高级功能 -->
-        <template v-if="userStore.userInfo?.role === 'admin'">
-          <div class="menu-divider">系统管理</div>
-          <el-menu-item index="/admin/users">
+        <!-- 管理与审批面板 -->
+        <template v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
+          <div class="menu-divider">管理面板</div>
+          <el-menu-item index="/admin/users" v-if="userStore.userInfo?.role === 'admin'">
             <el-icon><User /></el-icon>
             <span>人员大盘管理</span>
           </el-menu-item>
           <el-menu-item index="/admin/teams">
             <el-icon><Management /></el-icon>
-            <span>加组申请审批</span>
+            <span>课题组审批</span>
           </el-menu-item>
         </template>
       </el-menu>
@@ -70,23 +70,23 @@
           <el-icon><DataBoard /></el-icon>
           <span>工作台</span>
         </el-menu-item>
-        <el-menu-item index="/projects" v-if="userStore.userInfo?.role === 'admin'">
+        <el-menu-item index="/projects" v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
           <el-icon><Files /></el-icon>
-          <span>实验项目</span>
+          <span>{{ userStore.userInfo?.role === 'teacher' ? '辖区项目看板' : '实验项目' }}</span>
         </el-menu-item>
         <el-menu-item index="/records">
           <el-icon><Document /></el-icon>
           <span>历史记录</span>
         </el-menu-item>
-        <template v-if="userStore.userInfo?.role === 'admin'">
-          <div class="menu-divider">系统管理</div>
-          <el-menu-item index="/admin/users">
+        <template v-if="['admin', 'teacher'].includes(userStore.userInfo?.role)">
+          <div class="menu-divider">管理面板</div>
+          <el-menu-item index="/admin/users" v-if="userStore.userInfo?.role === 'admin'">
             <el-icon><User /></el-icon>
             <span>人员大盘管理</span>
           </el-menu-item>
           <el-menu-item index="/admin/teams">
             <el-icon><Management /></el-icon>
-            <span>加组申请审批</span>
+            <span>课题组审批</span>
           </el-menu-item>
         </template>
       </el-menu>
