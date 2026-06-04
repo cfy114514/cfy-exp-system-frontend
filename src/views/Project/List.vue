@@ -65,8 +65,15 @@
         <el-form-item label="项目描述">
           <el-input type="textarea" v-model="createForm.description" placeholder="请输入实验的相关描述" />
         </el-form-item>
-        <el-form-item label="关联分组">
-            <el-input v-model="createForm.group_id" placeholder="如果需要，请输入对应上级分组ID" />
+        <el-form-item label="关联分组" required>
+          <el-select v-model="createForm.group_id" placeholder="请选择关联课题组" style="width: 100%;">
+            <el-option
+              v-for="g in myGroups"
+              :key="g.group_id || g.id"
+              :label="g.name"
+              :value="String(g.group_id || g.id)"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -83,7 +90,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
-import { ProjectAPI } from '@/api';
+import { ProjectAPI, GroupAPI } from '@/api';
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
@@ -96,11 +103,26 @@ const loading = ref(false);
 // ---- 创建项目表单的变量代理 ----
 const createDialogVisible = ref(false);
 const creating = ref(false);
+const myGroups = ref<any[]>([]);
 const createForm = ref({
   project_name: '',
   description: '',
   group_id: ''
 });
+
+const loadGroups = async () => {
+  if (userStore.userInfo?.role === 'admin' || userStore.userInfo?.role === 'teacher') {
+    try {
+      const res: any = await GroupAPI.getGroups();
+      myGroups.value = (res.data || res).filter((g: any) => g.group_type !== 'private');
+      if (myGroups.value.length > 0) {
+        createForm.value.group_id = String(myGroups.value[0].group_id || myGroups.value[0].id);
+      }
+    } catch (e) {
+      console.error('无法拉取课题组列表');
+    }
+  }
+};
 
 const loadProjects = async () => {
   loading.value = true;
@@ -117,6 +139,7 @@ const loadProjects = async () => {
 
 onMounted(() => {
   loadProjects();
+  loadGroups();
 });
 
 const jumpToEntry = (projectId: string, projectName: string) => {
