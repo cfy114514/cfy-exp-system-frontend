@@ -1,5 +1,5 @@
 // ========== 角色相关 (Roles) ==========
-export type UserRole = 'admin' | 'teacher' | 'operator';
+export type UserRole = 'admin' | 'teacher' | 'student' | 'operator';
 
 // ========== 2.2 用户数据模型 (User Model) ==========
 export interface User {

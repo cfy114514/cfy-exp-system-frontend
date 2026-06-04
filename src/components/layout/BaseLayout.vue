@@ -20,7 +20,7 @@
           <span>工作台</span>
         </el-menu-item>
         
-        <el-menu-item index="/projects" v-if="userStore.userInfo?.role && ['admin', 'teacher'].includes(userStore.userInfo.role)">
+        <el-menu-item index="/projects" v-if="userStore.userInfo?.role && ['admin', 'teacher', 'student', 'operator'].includes(userStore.userInfo.role)">
           <el-icon><Files /></el-icon>
           <span>{{ userStore.userInfo?.role === 'teacher' ? '辖区项目看板' : '实验项目' }}</span>
         </el-menu-item>
@@ -70,7 +70,7 @@
           <el-icon><DataBoard /></el-icon>
           <span>工作台</span>
         </el-menu-item>
-        <el-menu-item index="/projects" v-if="userStore.userInfo?.role && ['admin', 'teacher'].includes(userStore.userInfo.role)">
+        <el-menu-item index="/projects" v-if="userStore.userInfo?.role && ['admin', 'teacher', 'student', 'operator'].includes(userStore.userInfo.role)">
           <el-icon><Files /></el-icon>
           <span>{{ userStore.userInfo?.role === 'teacher' ? '辖区项目看板' : '实验项目' }}</span>
         </el-menu-item>

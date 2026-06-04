@@ -12,6 +12,20 @@
         </p>
       </div>
     </el-card>
+
+    <!-- 仅学子可见：快捷入组申请 -->
+    <el-card shadow="never" class="apply-group-card mb-4" v-if="userStore.userInfo?.role === 'student' || userStore.userInfo?.role === 'operator'">
+      <template #header>
+        <div style="font-weight: bold; display: flex; align-items: center; gap: 8px;">
+          <el-icon><Stamp /></el-icon>
+          <span>申请加入课题组</span>
+        </div>
+      </template>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <el-input-number v-model="applyGroupId" :min="1" placeholder="目标课题组 ID" style="width: 220px;" :controls="false" />
+        <el-button type="primary" :loading="applying" @click="handleApplyGroup">提交入组申请</el-button>
+      </div>
+    </el-card>
     
     <el-row :gutter="20" class="mt-4">
       <el-col :xs="24" :sm="16" class="col-responsive flex-mb">
@@ -61,10 +75,31 @@
 import { ref, onMounted, computed } from 'vue';
 import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
-import { DashboardAPI } from '@/api';
+import { DashboardAPI, GroupAPI } from '@/api';
 import { ElMessage } from 'element-plus';
+import { Stamp } from '@element-plus/icons-vue';
 
 const userStore = useUserStore();
+
+const applyGroupId = ref<number | null>(null);
+const applying = ref(false);
+
+const handleApplyGroup = async () => {
+  if (!applyGroupId.value) {
+    ElMessage.warning('请输入要加入的课题组 ID！');
+    return;
+  }
+  applying.value = true;
+  try {
+    const res: any = await GroupAPI.applyToGroup(applyGroupId.value);
+    ElMessage.success(res.message || '入组申请提交成功，请等待导师审批！');
+    applyGroupId.value = null;
+  } catch (err: any) {
+    ElMessage.error(err.response?.data?.detail || '申请提交失败，请核对课题组 ID 是否正确。');
+  } finally {
+    applying.value = false;
+  }
+};
 
 const progressColors = [
   { color: '#5cb87a', percentage: 40 },
